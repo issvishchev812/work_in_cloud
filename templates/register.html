@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1>Регистрация</h1>
+    <h1>Регистрация {{ rnfh|default('Пользователя') }}</h1>
     <form action="" method="post">
         {{ form.hidden_tag() }}
         <p>
@@ -55,25 +55,28 @@
             {% endfor %}
         </p>
 
-        <p>
-            {{ form.age.label }}<br>
-            {{ form.age(class="form-control") }}<br>
-            {% for error in form.age.errors %}
-                <p class="alert alert-danger" role="alert">
-                    {{ error }}
-                </p>
-            {% endfor %}
-        </p>
 
-        <p>
-            {{ form.profession.label }}<br>
-            {{ form.profession(class="form-control") }}<br>
-            {% for error in form.profession.errors %}
-                <p class="alert alert-danger" role="alert">
-                    {{ error }}
-                </p>
-            {% endfor %}
-        </p>
+        {% if role == 'executor' %}
+            <p>
+                {{ form.profession.label }}<br>
+                {{ form.profession(class="form-control") }}<br>
+                {% for error in form.profession.errors %}
+                    <p class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </p>
+                {% endfor %}
+            </p>
+
+            <p>
+                {{ form.portfolio_link.label }}<br>
+                {{ form.portfolio_link(class="form-control") }}<br>
+                {% for error in form.portfolio_link.errors %}
+                    <p class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </p>
+                {% endfor %}
+            </p>
+        {% endif %}
 
         <p>
             {{ form.about.label }}<br>
@@ -84,21 +87,6 @@
                 </p>
             {% endfor %}
         </p>
-        <div class="form-group">
-                <label for="role">Выберите роль:</label><br>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="role" id="role_customer" value="customer">
-                    <label class="form-check-label" for="role_customer">
-                        Заказчик
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="role" id="role_executor" value="executor">
-                    <label class="form-check-label" for="role_executor">
-                        Исполнитель
-                    </label>
-                </div>
-            </div>
         <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
         {{message}}
     </form>

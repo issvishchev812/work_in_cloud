@@ -1,8 +1,8 @@
-from flask import Flask, render_template, redirect
+from flask import Flask, render_template, redirect, request, flash, url_for
 from data import db_session
 from data.loginform import LoginForm
 from data.users import User
-from data.registration_form import RegisterForm
+from data.registration_form import RegisterForm, ExecutorRegistrationForm
 from flask_login import LoginManager, login_user, login_required, logout_user
 
 app = Flask(__name__)
@@ -22,10 +22,27 @@ def load_user(user_id):
 def index():
     return render_template('index.html')
 
+@app.route('/select_role')
+def select_role():
+    return render_template('select_role.html')
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def reqister():
     form = RegisterForm()
+    print(form.data)
+    role = request.args.get('role', None)
+    if not role or role.lower() not in ['customer', 'executor']:
+        flash('Пожалуйста, выберите правильный тип учетной записи.', 'warning')
+        return redirect(url_for('select_role'))  # Перенаправляем обратно на выбор роли
+
+    if role.lower() == 'executor':
+        role_name_for_h1 = 'исполнителя'
+
+        form = ExecutorRegistrationForm()
+    else:
+        role_name_for_h1 = 'заказчика'
+
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
             return render_template('register.html', title='Регистрация',
@@ -40,16 +57,16 @@ def reqister():
             name=form.name.data,
             email=form.email.data,
             about=form.about.data,
-            age=form.age.data,
+            portfolio_link=form.portfolio_link.data,
             profession=form.profession.data,
             surname=form.surname.data,
-            role=form.role.data
+            role=role
         )
         user.set_password(form.password.data)
         db_sess.add(user)
         db_sess.commit()
         return redirect('/login')
-    return render_template('register.html', title='Регистрация', form=form)
+    return render_template('register.html', title='Регистрация', form=form, role=role, rnfh=role_name_for_h1)
 
 
 @app.route('/login', methods=['GET', 'POST'])

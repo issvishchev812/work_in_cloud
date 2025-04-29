@@ -9,9 +9,11 @@ class RegisterForm(FlaskForm):
     password_again = PasswordField('Повторите пароль', validators=[DataRequired()])
     name = StringField('Имя', validators=[DataRequired()])
     surname = StringField('Фамилия', validators=[DataRequired()])
-    age = IntegerField('Возраст', validators=[DataRequired()])
     profession = StringField('Профессия', validators=[DataRequired()])
     about = TextAreaField("Немного о себе")
-    role = RadioField('Выберите роль', choices=[('customer', 'Заказчик'), ('executor', 'Исполнитель')],
-                      validators=[DataRequired()])
     submit = SubmitField('Войти')
+
+
+class ExecutorRegistrationForm(RegisterForm):
+    # Дополнительные поля для исполнителя
+    portfolio_link = StringField('Portfolio Link', validators=[DataRequired()])

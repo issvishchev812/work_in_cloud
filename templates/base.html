@@ -18,8 +18,11 @@
 
             <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                 <li><a href="#" class="nav-link px-4 link-secondary">Home</a></li>
-                <li><a href="#" class="nav-link px-4 link-body-emphasis">Give a job</a></li>
-                <li><a href="#" class="nav-link px-4 link-body-emphasis">Get a job</a></li>
+                {% if current_user.role == 'customer' %}
+                    <li><a href="#" class="nav-link px-4 link-body-emphasis">Give a job</a></li>
+                {% else %}
+                    <li><a href="#" class="nav-link px-4 link-body-emphasis">Get a job</a></li>
+                {% endif %}
                 <li><a href="#" class="nav-link px-4 link-body-emphasis">About</a></li>
             </ul>
 
@@ -42,7 +45,7 @@
                 </div>
             {% else %}
                 <div class="text-end">
-                    <a href="/register" class="btn btn-outline-primary me-2">Зарегистрироваться</a>
+                    <a href="/select_role" class="btn btn-outline-primary me-2">Зарегистрироваться</a>
                     <a href="/login" class="btn btn-primary">Войти</a>
                 </div>
             {% endif %}

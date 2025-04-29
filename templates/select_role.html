@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Кто Вы?</h1>
+    <a href="/register?role=customer" class="btn btn-success">Заказчик</a>
+    <a href="/register?role=executor" class="btn btn-info">Исполнитель</a>
+</div>
+{% endblock %}
