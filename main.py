@@ -84,7 +84,8 @@ def register():
             name=form.name.data,
             email=form.email.data,
             about=form.about.data,
-            surname=form.surname.data
+            surname=form.surname.data,
+            role=role
         )
         user.set_password(form.password.data)
         db_sess.add(user)

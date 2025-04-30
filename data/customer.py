@@ -19,6 +19,8 @@ class Customer(SqlAlchemyBase, UserMixin):
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     created_date = sqlalchemy.Column(sqlalchemy.DateTime,
                                      default=datetime.datetime.now)
+    role = sqlalchemy.Column(sqlalchemy.String, nullable=True, default='customer')
+
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password, method="pbkdf2")
