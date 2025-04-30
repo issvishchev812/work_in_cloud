@@ -1,9 +1,12 @@
 from flask import Flask, render_template, redirect, request, flash, url_for
 from data import db_session
 from data.loginform import LoginForm
-from data.users import User
+from data.executor import Executor
+from data.customer import Customer
 from data.registration_form import RegisterForm, ExecutorRegistrationForm
 from flask_login import LoginManager, login_user, login_required, logout_user
+
+from data.user import User
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -20,7 +23,7 @@ def load_user(user_id):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('select_role.html')
 
 @app.route('/select_role')
 def select_role():
@@ -28,20 +31,16 @@ def select_role():
 
 
 @app.route('/register', methods=['GET', 'POST'])
-def reqister():
-    form = RegisterForm()
-    print(form.data)
+def register():
     role = request.args.get('role', None)
     if not role or role.lower() not in ['customer', 'executor']:
         flash('Пожалуйста, выберите правильный тип учетной записи.', 'warning')
         return redirect(url_for('select_role'))  # Перенаправляем обратно на выбор роли
 
     if role.lower() == 'executor':
-        role_name_for_h1 = 'исполнителя'
-
         form = ExecutorRegistrationForm()
     else:
-        role_name_for_h1 = 'заказчика'
+        form = RegisterForm()
 
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
@@ -49,24 +48,50 @@ def reqister():
                                    form=form,
                                    message="Пароли не совпадают")
         db_sess = db_session.create_session()
-        if db_sess.query(User).filter(User.email == form.email.data).first():
-            return render_template('register.html', title='Регистрация',
-                                   form=form,
-                                   message="Такой пользователь уже есть")
+
+        if role.lower() == 'executor':
+            if db_sess.query(Executor).filter(Executor.email == form.email.data).first():
+                return render_template('register.html', title='Регистрация',
+                                       form=form,
+                                       message="Такой пользователь уже есть")
+
+            executor = Executor(
+                name=form.name.data,
+                email=form.email.data,
+                about=form.about.data,
+                surname=form.surname.data,
+                profession=form.profession.data,
+                portfolio_link=form.portfolio_link.data
+            )
+            executor.set_password(form.password.data)
+            db_sess.add(executor)
+        else:
+            if db_sess.query(Customer).filter(Customer.email == form.email.data).first():
+                return render_template('register.html', title='Регистрация',
+                                       form=form,
+                                       message="Такой пользователь уже есть")
+
+            customer = Customer(
+                name=form.name.data,
+                email=form.email.data,
+                about=form.about.data,
+                surname=form.surname.data
+            )
+            customer.set_password(form.password.data)
+            db_sess.add(customer)
+
         user = User(
             name=form.name.data,
             email=form.email.data,
             about=form.about.data,
-            portfolio_link=form.portfolio_link.data,
-            profession=form.profession.data,
-            surname=form.surname.data,
-            role=role
+            surname=form.surname.data
         )
         user.set_password(form.password.data)
         db_sess.add(user)
+
         db_sess.commit()
         return redirect('/login')
-    return render_template('register.html', title='Регистрация', form=form, role=role, rnfh=role_name_for_h1)
+    return render_template('register.html', title='Регистрация', form=form, role=role)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -74,14 +99,33 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
-        user = db_sess.query(User).filter(User.email == form.email.data).first()
-        if user and user.check_password(form.password.data):
-            login_user(user, remember=form.remember_me.data)
-            return redirect("/")
-        return render_template('login.html',
-                               message="Неправильный логин или пароль",
-                               form=form)
+        if form.role.data == 'executor':
+            executor = db_sess.query(Executor).filter(Executor.email == form.email.data).first()
+            if executor and executor.check_password(form.password.data):
+                login_user(executor, remember=form.remember_me.data)
+                return redirect("/main")
+            return render_template('login.html',
+                                   message="Неправильный логин или пароль",
+                                   form=form)
+
+        else:
+            customer = db_sess.query(Customer).filter(Customer.email == form.email.data).first()
+            if customer and customer.check_password(form.password.data):
+                login_user(customer, remember=form.remember_me.data)
+                return redirect("/main")
+            return render_template('login.html',
+                                   message="Неправильный логин или пароль",
+                                   form=form)
+
     return render_template('login.html', title='Авторизация', form=form)
+
+
+@app.route('/main')
+@login_required
+def main_page():
+    return render_template('home.html')
+
+
 
 
 @app.route('/logout')

@@ -11,22 +11,22 @@
 <header class="p-3 mb-3 border-bottom">
     <div class="container">
         <div class="d-flex flex-wrap align-items-center justify-content-between">
-            <a style="margin-right: 85px">
+            <a style="margin-right: 65px">
                 <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"><use xlink:href="#bootstrap"></use></svg>
                 <span class="fs-4">Work In Cloud</span>
             </a>
 
             <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-                <li><a href="#" class="nav-link px-4 link-secondary">Home</a></li>
+                <li><a href="#" class="nav-link px-5 link-secondary">Home</a></li>
                 {% if current_user.role == 'customer' %}
-                    <li><a href="#" class="nav-link px-4 link-body-emphasis">Give a job</a></li>
+                    <li><a href="#" class="nav-link px-5 link-body-emphasis">Give a job</a></li>
                 {% else %}
-                    <li><a href="#" class="nav-link px-4 link-body-emphasis">Get a job</a></li>
+                    <li><a href="#" class="nav-link px-5 link-body-emphasis">Get a job</a></li>
                 {% endif %}
-                <li><a href="#" class="nav-link px-4 link-body-emphasis">About</a></li>
+                <li><a href="#" class="nav-link px-5 link-body-emphasis">About</a></li>
             </ul>
 
-            <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
+            <form style="width: 400px; margin-left: -50px;" class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
                 <input type="search" class="form-control" placeholder="Search..." aria-label="Search">
             </form>
 

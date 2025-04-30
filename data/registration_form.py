@@ -9,11 +9,11 @@ class RegisterForm(FlaskForm):
     password_again = PasswordField('Повторите пароль', validators=[DataRequired()])
     name = StringField('Имя', validators=[DataRequired()])
     surname = StringField('Фамилия', validators=[DataRequired()])
-    profession = StringField('Профессия', validators=[DataRequired()])
     about = TextAreaField("Немного о себе")
     submit = SubmitField('Войти')
 
 
 class ExecutorRegistrationForm(RegisterForm):
     # Дополнительные поля для исполнителя
-    portfolio_link = StringField('Portfolio Link', validators=[DataRequired()])
+    portfolio_link = StringField('Ссылка на портфолио', validators=[DataRequired()])
+    profession = StringField('Профессия', validators=[DataRequired()])
