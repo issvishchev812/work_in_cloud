@@ -1,12 +1,14 @@
-from flask import Flask, render_template, redirect, request, flash, url_for
+from flask import Flask, render_template, redirect, request, flash, url_for, abort
 from data import db_session
+from data.jobsform import JobsForm
 from data.loginform import LoginForm
 from data.executor import Executor
 from data.customer import Customer
 from data.registration_form import RegisterForm, ExecutorRegistrationForm
-from flask_login import LoginManager, login_user, login_required, logout_user
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 
 from data.user import User
+from data.vacancy import Vacancy
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -126,6 +128,90 @@ def login():
 def main_page():
     return render_template('home.html')
 
+
+@app.route('/give_a_job')
+@login_required
+def give_a_job():
+    db_sess = db_session.create_session()
+    for job in db_sess.query(Vacancy).join(Customer).all():
+        print(job.id)
+    return render_template('give_a_job.html', arr=db_sess.query(Vacancy).join(Customer).all())
+
+
+@app.route('/add_job', methods=['GET', 'POST'])
+@login_required
+def add_job():
+    form = JobsForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        job = Vacancy(
+            creator_id=current_user.id,
+            job_name=form.job_name.data,
+            work_size=form.work_size.data,
+            description=form.description.data,
+            salary=form.salary.data
+        )
+        db_sess.add(job)
+        db_sess.commit()
+        return redirect('/give_a_job')
+    return render_template('add_job.html', title='Добавление работы',
+                           form=form)
+
+
+@app.route('/jobs_edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_news(id):
+    form = JobsForm()
+    if request.method == "GET":
+        db_sess = db_session.create_session()
+        jobs = db_sess.query(Vacancy).get(id)
+        if not jobs or jobs.customer != current_user:
+            abort(403)
+        if jobs:
+            form.job_name.data = jobs.job_name
+            form.salary.data = jobs.salary
+            form.work_size.data = jobs.work_size
+            form.description.data = jobs.description
+            form.is_finished.data = jobs.is_finished
+        else:
+            abort(404)
+
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        jobs = db_sess.query(Vacancy).get(id)
+        if not jobs or jobs.customer != current_user:
+            abort(403)
+        if jobs:
+            # Обновляем данные из формы
+            jobs.job_name = form.job_name.data
+            jobs.salary = form.salary.data
+            jobs.work_size = form.work_size.data
+            jobs.description = form.description.data
+            jobs.is_finished = form.is_finished.data
+            # Сохраняем изменения в базе данных
+            db_sess.commit()
+            return redirect('/give_a_job')
+        else:
+            abort(404)
+    return render_template('edit_jobs.html',
+                           title='Редактирование работы',
+                           form=form
+                           )
+
+
+@app.route('/jobs_delete/<int:id>', methods=['GET', 'POST'])
+@login_required
+def news_delete(id):
+    db_sess = db_session.create_session()
+    jobs = db_sess.query(Vacancy).get(id)
+    if not jobs or jobs.customer != current_user:
+        abort(403)
+    if jobs:
+        db_sess.delete(jobs)
+        db_sess.commit()
+    else:
+        abort(404)
+    return redirect('/give_a_job')
 
 
 

@@ -9,8 +9,11 @@ class Vacancy(SqlAlchemyBase):
 
     id = sqlalchemy.Column(sqlalchemy.Integer,
                            primary_key=True, autoincrement=True)
+    creator_id = sqlalchemy.Column(sqlalchemy.String,
+                                    sqlalchemy.ForeignKey("customers.id"))
+    customer = orm.relationship('Customer')
     job_name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     work_size = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
-    company_name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    description = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     salary = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     is_finished = sqlalchemy.Column(sqlalchemy.Boolean)

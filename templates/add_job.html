@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div style='width: 800px' class="container mt-5">
+    <h1>Добавление работы</h1>
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.job_name.label }}<br>
+            {{ form.job_name(class="form-control") }}<br>
+            {% for error in form.job_name.errors %}
+                <p content="alert alert-danger" role="alert">
+                    {{ error }}
+                </p>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.work_size.label }}<br>
+            {{ form.work_size(class="form-control") }}<br>
+            {% for error in form.work_size.errors %}
+                <p content="alert alert-danger" role="alert">
+                    {{ error }}
+                </p>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.description.label }}<br>
+            {{ form.description(class="form-control") }}<br>
+            {% for error in form.description.errors %}
+                <p content="alert alert-danger" role="alert">
+                    {{ error }}
+                </p>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.salary.label }}<br>
+            {{ form.salary(class="form-control") }}<br>
+            {% for error in form.salary.errors %}
+                <p content="alert alert-danger" role="alert">
+                    {{ error }}
+                </p>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+        {{message}}
+    </form>
+</div>
+{% endblock %}
