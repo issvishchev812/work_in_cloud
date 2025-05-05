@@ -4,10 +4,10 @@
 {% if current_user.is_authenticated %}
 <div class="container">
     <h1 class="text-center">Works log</h1>
-    <div class="d-flex justify-content-center">
+    <div class="d-flex flex-column align-items-center">
         {% for job in arr %}
         {% if not job.is_finished %}
-        <div style="width: 1000px" class="card mb-3">
+        <div style="width: 800px; margin-bottom: 20px;" class="card">
             <div class="card-header">
                 <h2>Job #{{ loop.index }}</h2>
             </div>

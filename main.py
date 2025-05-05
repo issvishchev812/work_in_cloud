@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import Flask, render_template, redirect, request, flash, url_for, abort
 from data import db_session
 from data.jobsform import JobsForm
@@ -17,6 +19,8 @@ db_session.global_init("db/work_in_cloud.db")
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+messages = []
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -220,6 +224,26 @@ def news_delete(id):
 def logout():
     logout_user()
     return redirect("/")
+
+@app.route("/send", methods=['POST'])
+@login_required
+def send_message():
+    participant = request.form.get('participant')
+    message_content = request.form.get('message')
+    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    messages.append({
+        'sender': participant,
+        'content': message_content,
+        'timestamp': now
+    })
+    print(messages)
+    return redirect(request.referrer or "/eee")
+
+
+@app.route('/eee')
+def eee():
+    return render_template('eee.html', messages=messages)
+
 
 
 if __name__ == '__main__':

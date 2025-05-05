@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Чат заказчика и исполнителя</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta http-equiv="refresh" content="10"> <!-- Автоматическая перезагрузка страницы каждые 10 секунд -->
+</head>
+<body>
+    <div class="chat-container">
+        <h1>Чат заказчика и исполнителя</h1>
+        <div class="dialogue">
+            <!-- Динамические сообщения будут подставляться сюда -->
+            {% for message in messages %}
+            <div class="message {{ message.sender_class }}">
+                <img src="{{ message.avatar_url }}" alt="{{ message.sender }}'s Avatar" class="avatar">
+                <div class="text-box">
+                    <p class="sender-name">{{ message.sender }}</p>
+                    <p class="message-text">{{ message.content }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Форма отправки сообщений -->
+        <form action="/send" method="post">
+            <textarea name="message" placeholder="Введите сообщение..."></textarea>
+            <button type="submit">Отправить</button>
+        </form>
+    </div>
+</body>
+</html>
