@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, StringField, TextAreaField, SubmitField, EmailField, IntegerField, RadioField
-from wtforms.validators import DataRequired
+from flask_wtf.file import FileAllowed
+from wtforms import PasswordField, StringField, TextAreaField, SubmitField, EmailField, FileField
+from wtforms.validators import DataRequired, InputRequired, Optional
 
 
 class RegisterForm(FlaskForm):
@@ -10,8 +11,11 @@ class RegisterForm(FlaskForm):
     name = StringField('Имя', validators=[DataRequired()])
     surname = StringField('Фамилия', validators=[DataRequired()])
     about = TextAreaField("Немного о себе")
+    avatar = FileField(label='Выберите аватарку', validators=[
+        FileAllowed(['jpg', 'png'], 'Только jpg/png'),
+        Optional(),  # Сделали поле опциональным
+    ])
     submit = SubmitField('Войти')
-
 
 class ExecutorRegistrationForm(RegisterForm):
     # Дополнительные поля для исполнителя
