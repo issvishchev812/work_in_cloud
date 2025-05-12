@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h2>Чат по работе: {{ job.job_name }}</h2>
+            <p class="mb-0">Заказчик: {{ customer.name }} {{ customer.surname }}</p>
+            <p class="mb-0">Исполнитель: {{ executor.name }} {{ executor.surname }}</p>
+        </div>
+        <div class="card-body" style="height: 400px; overflow-y: auto;">
+            <!-- Здесь будут сообщения -->
+            <div class="text-center text-muted mt-5">
+                <p>Чат пока пуст. Напишите первое сообщение!</p>
+            </div>
+        </div>
+        <div class="card-footer">
+            <form action="/send_message" method="post">
+                <div class="input-group">
+                    <input type="hidden" name="job_id" value="{{ job.id }}">
+                    <input type="hidden" name="receiver_id"
+                           value="{{ customer.id if current_user.id == executor.id else executor.id }}">
+                    <input type="text" name="message" class="form-control" placeholder="Введите сообщение...">
+                    <button type="submit" class="btn btn-primary">Отправить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

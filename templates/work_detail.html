@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% if current_user.is_authenticated %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card my-5">
+                <div class="card-header text-center bg-primary text-white">
+                    <h1 class="card-title">{{ job.job_name }}</h1>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8 offset-md-2">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <strong>Заказчик:</strong> {{ job.customer.name }} {{ job.customer.surname }}
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>Объем работы:</strong> {{ job.work_size }} Часов
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>Описание:</strong> {{ job.description }}
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>Оплата:</strong> {{ job.salary }} ₽
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>Статус:</strong>
+                                    {% if job.is_finished %}
+                                    <span class="badge bg-success">Завершена</span>
+                                    {% else %}
+                                    <span class="badge bg-warning text-dark">В процессе</span>
+                                    {% endif %}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    {% if current_user.is_authenticated and current_user.role == "executor" %}
+                    {% if current_user.id|string in job.responders.split() %}
+                    <a href="/chat/{{ job.customer.id }}-{{ current_user.id }}" class="btn btn-success">Открыть чат</a>
+                    {% else %}
+                    <a href="/respond_to_job/{{ job.id }}" class="btn btn-info">Откликнуться</a>
+                    {% endif %}
+                    {% endif %}
+                    {% if current_user.is_authenticated and current_user.id == job.customer.id and current_user.role ==
+                    "customer" %}
+                    <a href="/jobs" class="btn btn-secondary">Вернуться</a>
+                    <a href="/jobs_edit/{{ job.id }}" class="btn btn-warning">Изменить</a>
+                    <a href="/jobs_delete/{{ job.id }}" class="btn btn-danger">Завершить</a>
+                    {% else %}
+                    <a href="/jobs" class="btn btn-secondary">Вернуться</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
