@@ -230,30 +230,28 @@ def respond_to_job(job_id):
     return redirect(request.referrer or url_for('give_a_job'))
 
 
-@app.route('/chat/<int:customer_id>-<int:executor_id>')
+@app.route('/chat/<int:customer_id>-<int:executor_id>-<int:job_id>')
 @login_required
-def chat(customer_id, executor_id):
-    # Проверяем, что текущий пользователь - один из участников чата
-    if current_user.id not in [customer_id, executor_id]:
-        abort(403)
-
-    # Проверяем, что исполнитель действительно откликнулся на работу
+def chat(customer_id, executor_id, job_id):
+    # Проверка доступа
     db_sess = db_session.create_session()
-    job = db_sess.query(Vacancy).filter(
-        Vacancy.creator_id == customer_id,
-        Vacancy.responders.contains(str(executor_id))
-    ).first()
-
+    job = db_sess.query(Vacancy).get(job_id)
+    customer = db_sess.query(User).get(customer_id)
+    executor = db_sess.query(User).get(executor_id)
     if not job:
         abort(404)
 
-    # Получаем данные участников чата
-    customer = db_sess.query(User).get(customer_id)
-    executor = db_sess.query(User).get(executor_id)
+    # Проверяем, что текущий пользователь - либо заказчик, либо откликнувшийся исполнитель
+    responders = job.responders.split() if job.responders else []
+    if not (current_user.id == customer_id or
+            (current_user.role == 'executor' and str(current_user.id) in responders)):
+        abort(403)
 
+    # Здесь можно добавить логику получения сообщений
     return render_template('chat.html',
                            customer=customer,
                            executor=executor,
+                           job_id=job_id,
                            job=job)
 
 

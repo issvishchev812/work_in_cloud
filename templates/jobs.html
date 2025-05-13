@@ -34,7 +34,7 @@
                 </div>
                 {% if current_user.is_authenticated and current_user.role == "executor" %}
                 {% if current_user.id|string in job.responders.split() %}
-                <a href="/chat/{{ job.customer.id }}-{{ current_user.id }}" class="btn btn-success">Открыть чат</a>
+                <a href="/chat/{{ job.customer.id }}-{{ current_user.id }}-{{ job.id }}" class="btn btn-success">Открыть чат</a>
                 {% else %}
                 <a href="/respond_to_job/{{ job.id }}" class="btn btn-info">Откликнуться</a>
                 {% endif %}
