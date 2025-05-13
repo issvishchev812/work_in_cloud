@@ -17,30 +17,25 @@
             </a>
 
             <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-                <li><a href="/main" class="nav-link px-5 link-secondary">Home</a></li>
-                {% if current_user.role == "customer" %}
-                    <li><a href="/give_a_job" class="nav-link px-5 link-body-emphasis">For customers</a></li>
-                {% else %}
-                    <li><a href="/get_a_job" class="nav-link px-5 link-body-emphasis">For executors</a></li>
-                {% endif %}
-                <li><a href="/about" class="nav-link px-5 link-body-emphasis">About</a></li>
+                <li><a href="/main" class="nav-link px-5 link-secondary">Домашняя страница</a></li>
+                <li><a href="/jobs" class="nav-link px-5 link-body-emphasis">Все заказы</a></li>
+                <li><a href="/about" class="nav-link px-5 link-body-emphasis">О нас</a></li>
             </ul>
 
             <form style="width: 400px; margin-left: -50px;" class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
-                <input type="search" class="form-control" placeholder="Search..." aria-label="Search">
+                <input type="search" class="form-control" placeholder="Поиск..." aria-label="Search">
             </form>
 
             {% if current_user.is_authenticated %}
                 <div class="dropdown text-end">
                     <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="{{ current_user.avatar_path }}" alt="mdo" width="32" height="32" class="rounded-circle">
+                        <img src="{{ current_user.avatar_path }}" alt="avatar" width="32" height="32" class="rounded-circle">
 
                     </a>
                     <ul class="dropdown-menu text-small" style="">
-                        <li><a class="dropdown-item" href="#">Settings</a></li>
-                        <li><a class="dropdown-item" href="/profile">Profile</a></li>
+                        <li><a class="dropdown-item" href="/profile">Профиль</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="/logout">Sign out</a></li>
+                        <li><a class="dropdown-item" href="/logout">Выйти из профиля</a></li>
                     </ul>
                 </div>
             {% else %}

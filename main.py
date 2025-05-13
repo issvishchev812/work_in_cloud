@@ -63,8 +63,10 @@ def register():
         avatar_path = None
         if avatar:
             filename = secure_filename(avatar.filename)
-            avatar.save(os.path.join('static', app.config['UPLOAD_FOLDER'], filename))
+            avatar.save(os.path.join('static/' + app.config['UPLOAD_FOLDER'] + '/' + filename))
             avatar_path = filename
+        else:
+            avatar_path = r"basic_avatar.jpg"
 
         if db_sess.query(User).filter(User.email == form.email.data).first():
             return render_template('register.html', title='Регистрация', form=form, message="Такой email уже зарегистрирован.")
@@ -114,13 +116,13 @@ def main_page():
     return render_template('home.html')
 
 
-@app.route('/give_a_job')
+@app.route('/jobs')
 @login_required
-def give_a_job():
+def jobs():
     db_sess = db_session.create_session()
-    for job in db_sess.query(Vacancy).join(User).all():
-        print(job.id)
-    return render_template('give_a_job.html', arr=db_sess.query(Vacancy).join(User).all())
+    for jobs in db_sess.query(Vacancy).join(User).all():
+        print(jobs.id)
+    return render_template('jobs.html', arr=db_sess.query(Vacancy).join(User).all())
 
 
 @app.route('/add_job', methods=['GET', 'POST'])
@@ -138,7 +140,7 @@ def add_job():
         )
         db_sess.add(job)
         db_sess.commit()
-        return redirect('/give_a_job')
+        return redirect('/jobs')
     return render_template('add_job.html', title='Добавление работы',
                            form=form)
 
@@ -175,7 +177,7 @@ def edit_news(id):
             jobs.is_finished = form.is_finished.data
             # Сохраняем изменения в базе данных
             db_sess.commit()
-            return redirect('/give_a_job')
+            return redirect('/jobs')
         else:
             abort(404)
     return render_template('edit_jobs.html',
@@ -196,8 +198,79 @@ def news_delete(id):
         db_sess.commit()
     else:
         abort(404)
-    return redirect('/give_a_job')
+    return redirect('/jobs')
 
+
+@app.route('/work/<int:job_id>')
+@login_required
+def work_detail(job_id):
+    db_sess = db_session.create_session()
+    job = db_sess.query(Vacancy).join(User).filter(Vacancy.id == job_id).first()
+
+    return render_template('work_detail.html', job=job)
+
+
+@app.route('/respond_to_job/<int:job_id>', methods=['GET'])
+@login_required
+def respond_to_job(job_id):
+    if current_user.role != 'executor':
+        abort(403)
+
+    db_sess = db_session.create_session()
+    job = db_sess.query(Vacancy).get(job_id)
+
+    if not job:
+        abort(404)
+
+    # Добавляем ID исполнителя к списку откликнувшихся
+    if str(current_user.id) not in job.responders.split():
+        job.responders = f"{job.responders} {current_user.id}".strip()
+        db_sess.commit()
+
+    return redirect(request.referrer or url_for('give_a_job'))
+
+
+@app.route('/chat/<int:customer_id>-<int:executor_id>')
+@login_required
+def chat(customer_id, executor_id):
+    # Проверяем, что текущий пользователь - один из участников чата
+    if current_user.id not in [customer_id, executor_id]:
+        abort(403)
+
+    # Проверяем, что исполнитель действительно откликнулся на работу
+    db_sess = db_session.create_session()
+    job = db_sess.query(Vacancy).filter(
+        Vacancy.creator_id == customer_id,
+        Vacancy.responders.contains(str(executor_id))
+    ).first()
+
+    if not job:
+        abort(404)
+
+    # Получаем данные участников чата
+    customer = db_sess.query(User).get(customer_id)
+    executor = db_sess.query(User).get(executor_id)
+
+    return render_template('chat.html',
+                           customer=customer,
+                           executor=executor,
+                           job=job)
+
+
+@app.route('/send_message', methods=['POST'])
+@login_required
+def send_message():
+    job_id = request.form.get('job_id')
+    receiver_id = request.form.get('receiver_id')
+    message_content = request.form.get('message')
+
+    # Здесь должна быть логика сохранения сообщения в БД
+    # Например, можно создать таблицу messages и сохранять там
+
+    flash('Сообщение отправлено', 'success')
+    return redirect(url_for('chat',
+                            customer_id=current_user.id if current_user.role == 'customer' else receiver_id,
+                            executor_id=receiver_id if current_user.role == 'customer' else current_user.id))
 
 @app.route('/logout')
 @login_required
@@ -206,19 +279,19 @@ def logout():
     return redirect("/")
 
 
-@app.route("/send", methods=['POST'])
-@login_required
-def send_message():
-    participant = request.form.get('participant')
-    message_content = request.form.get('message')
-    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    messages.append({
-        'sender': participant,
-        'content': message_content,
-        'timestamp': now
-    })
-    print(messages)
-    return redirect(request.referrer or "/eee")
+# @app.route("/send", methods=['POST'])
+# @login_required
+# def send_message():
+#     participant = request.form.get('participant')
+#     message_content = request.form.get('message')
+#     now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+#     messages.append({
+#         'sender': participant,
+#         'content': message_content,
+#         'timestamp': now
+#     })
+#     print(messages)
+#     return redirect(request.referrer or "/eee")
 
 
 @app.route('/eee')

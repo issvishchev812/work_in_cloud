@@ -17,3 +17,4 @@ class Vacancy(SqlAlchemyBase):
     description = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     salary = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     is_finished = sqlalchemy.Column(sqlalchemy.Boolean)
+    responders = sqlalchemy.Column(sqlalchemy.String, nullable=True, default="")

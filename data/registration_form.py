@@ -12,7 +12,7 @@ class RegisterForm(FlaskForm):
     surname = StringField('Фамилия', validators=[DataRequired()])
     about = TextAreaField("Немного о себе")
     avatar = FileField(label='Выберите аватарку', validators=[
-        FileAllowed(['jpg', 'png'], 'Только jpg/png'),
+        FileAllowed(['jpg', 'png', 'jpeg'], 'Только jpg/png'),
         Optional(),  # Сделали поле опциональным
     ])
     submit = SubmitField('Войти')
