@@ -64,8 +64,12 @@
             <div class="row justify-content-center">
                 <div class="col-md-8 col-lg-6 text-center">
                     <h2 class="fw-bold">Начните свою карьеру в IT прямо сейчас!</h2>
-                    <p class="lead">Присоединяйтесь к нашей площадке и получите первый заказ уже сегодня.</p>
-                    <a href="/jobs" class="btn btn-primary btn-lg rounded-pill">Перейти к заказам</a>
+                    <p class="lead">Станьте частью нашей команды и найдите свой идеальный проект уже сегодня!</p>
+                    {% if current_user.role == 'executor' %}
+                        <a href="/jobs" class="btn btn-primary btn-lg rounded-pill">Перейти к заказам</a>
+                    {% else %}
+                        <a href="/jobs" class="btn btn-primary btn-lg rounded-pill">Разместить заказ</a>
+                    {% endif %}
                 </div>
             </div>
         </div>

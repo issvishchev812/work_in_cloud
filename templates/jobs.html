@@ -48,6 +48,11 @@
     {% endif %}
 
     <h1 class="text-center">Все заказы</h1>
+    <div class="text-center">
+        {% if current_user.is_authenticated and current_user.role == 'customer' %}
+            <a href="/add_job" class="btn btn-secondary">Добавить работу</a>
+        {% endif %}
+    </div><br>
     <div class="d-flex flex-column align-items-center">
         {% for job in arr %}
         {% if not job.is_finished %}
@@ -90,11 +95,7 @@
     </div>
 </div>
 
-<div class="text-center">
-    {% if current_user.is_authenticated and current_user.role == 'customer' %}
-    <a href="/add_job" class="btn btn-secondary">Добавить работу</a>
-    {% endif %}
-</div>
+
 
 {% endif %}
 {% endblock %}

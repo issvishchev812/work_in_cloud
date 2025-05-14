@@ -389,6 +389,13 @@ def search_jobs():
     return render_template("jobs.html", res=res, query=query, arr=db_sess.query(Vacancy).join(User).all())
 
 
+@app.route("/about")
+@login_required
+def about():
+
+    return render_template("about.html")
+
+
 
 if __name__ == '__main__':
     app.run(port=5252, host='127.0.0.1')
