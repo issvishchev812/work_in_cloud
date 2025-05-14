@@ -29,7 +29,7 @@
             {% if current_user.is_authenticated %}
                 <div class="dropdown text-end">
                     <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="{{ current_user.avatar_path }}" alt="avatar" width="32" height="32" class="rounded-circle">
+                        <img src="{{ url_for('static', filename='/'.join(current_user.avatar_path.split('/')[1:])) }}" alt="avatar" width="32" height="32" class="rounded-circle">
 
                     </a>
                     <ul class="dropdown-menu text-small" style="">

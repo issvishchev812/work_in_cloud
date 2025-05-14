@@ -67,7 +67,7 @@
                         {% for responder in responders_users %}
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div>
-                                    <img src="{{ responder.avatar_path }}" alt="Avatar" class="rounded-circle me-2" width="40" height="40">
+                                    <img src="{{ url_for('static', filename='/'.join(responder.avatar_path.split('/')[1:])) }}" alt="Avatar" class="rounded-circle me-2" width="40" height="40">
                                     <span>{{ responder.name }} {{ responder.surname }}</span>
                                 </div>
                                 <a href="/chat/{{ job.customer.id }}-{{ responder.id }}-{{ job.id }}"

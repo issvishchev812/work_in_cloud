@@ -267,12 +267,13 @@ def chat(customer_id, executor_id, job_id):
         Message.job_id == job_id
     ).order_by(Message.timestamp).all()
 
+
     return render_template('chat.html',
                            customer=customer,
                            executor=executor,
                            job_id=job_id,
                            job=job,
-                           messages=messages)
+                           messages=messages,)
 
 
 @app.route('/send_message', methods=['POST'])

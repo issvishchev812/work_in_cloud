@@ -14,7 +14,7 @@
                     <div class="mb-3 {% if message.sender_id == current_user.id %}text-end{% endif %}">
                         <div class="d-flex {% if message.sender_id == current_user.id %}justify-content-end{% else %}justify-content-start{% endif %}">
                             {% if message.sender_id != current_user.id %}
-                                <img src="{{ message.sender.avatar_path }}" alt="Avatar" class="rounded-circle me-2" width="40" height="40">
+                                <img src="{{ url_for('static', filename='/'.join(message.sender.avatar_path.split('/')[1:])) }}" alt="Avatar" class="rounded-circle me-2" width="40" height="40">
                             {% endif %}
                             <div>
                                 <div class="p-3 rounded {% if message.sender_id == current_user.id %}bg-primary text-white{% else %}bg-light{% endif %}">
@@ -30,7 +30,7 @@
                                 <small class="text-muted">{{ message.timestamp.strftime('%d.%m.%Y %H:%M') }}</small>
                             </div>
                             {% if message.sender_id == current_user.id %}
-                                <img src="{{ message.sender.avatar_path }}" alt="Avatar" class="rounded-circle ms-2" width="40" height="40">
+                                <img src="{{ url_for('static', filename='/'.join(message.sender.avatar_path.split('/')[1:])) }}" alt="Avatar" class="rounded-circle me-2" width="40" height="40">
                             {% endif %}
                         </div>
                     </div>
