@@ -1,8 +1,11 @@
 import os
 from datetime import datetime
 
-from flask import Flask, render_template, redirect, request, flash, url_for, abort
+from flask import Flask, render_template, redirect, request, flash, url_for, abort, send_file
 from werkzeug.utils import secure_filename
+from sqlalchemy.orm import joinedload
+from werkzeug.utils import send_from_directory
+
 
 from data import db_session
 from data.jobsform import JobsForm
@@ -10,6 +13,7 @@ from data.loginform import LoginForm
 from data.registration_form import RegisterForm, ExecutorRegistrationForm
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 
+from data.messages import Message
 from data.user import User
 from data.vacancy import Vacancy
 
@@ -205,9 +209,20 @@ def news_delete(id):
 @login_required
 def work_detail(job_id):
     db_sess = db_session.create_session()
-    job = db_sess.query(Vacancy).join(User).filter(Vacancy.id == job_id).first()
+    job = db_sess.query(Vacancy).options(joinedload(Vacancy.customer)).filter(Vacancy.id == job_id).first()
 
-    return render_template('work_detail.html', job=job)
+    if not job:
+        abort(404)
+
+    # Получаем всех откликнувшихся исполнителей
+    responders_ids = job.responders.split() if job.responders else []
+    responders_users = []
+    if responders_ids:
+        responders_users = db_sess.query(User).filter(
+            User.id.in_([int(id) for id in responders_ids])
+        ).all()
+
+    return render_template('work_detail.html', job=job, responders_users=responders_users)
 
 
 @app.route('/respond_to_job/<int:job_id>', methods=['GET'])
@@ -233,26 +248,31 @@ def respond_to_job(job_id):
 @app.route('/chat/<int:customer_id>-<int:executor_id>-<int:job_id>')
 @login_required
 def chat(customer_id, executor_id, job_id):
-    # Проверка доступа
     db_sess = db_session.create_session()
     job = db_sess.query(Vacancy).get(job_id)
     customer = db_sess.query(User).get(customer_id)
     executor = db_sess.query(User).get(executor_id)
+
     if not job:
         abort(404)
 
-    # Проверяем, что текущий пользователь - либо заказчик, либо откликнувшийся исполнитель
     responders = job.responders.split() if job.responders else []
     if not (current_user.id == customer_id or
             (current_user.role == 'executor' and str(current_user.id) in responders)):
         abort(403)
 
-    # Здесь можно добавить логику получения сообщений
+    messages = db_sess.query(Message).filter(
+        ((Message.sender_id == customer_id) & (Message.receiver_id == executor_id)) |
+        ((Message.sender_id == executor_id) & (Message.receiver_id == customer_id)),
+        Message.job_id == job_id
+    ).order_by(Message.timestamp).all()
+
     return render_template('chat.html',
                            customer=customer,
                            executor=executor,
                            job_id=job_id,
-                           job=job)
+                           job=job,
+                           messages=messages)
 
 
 @app.route('/send_message', methods=['POST'])
@@ -261,35 +281,64 @@ def send_message():
     job_id = request.form.get('job_id')
     receiver_id = request.form.get('receiver_id')
     message_content = request.form.get('message')
+    file = request.files.get('file')
 
-    # Здесь должна быть логика сохранения сообщения в БД
-    # Например, можно создать таблицу messages и сохранять там
+    db_sess = db_session.create_session()
 
-    flash('Сообщение отправлено', 'success')
+    file_path = None
+    if file and file.filename != '':
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(app.root_path, 'static', 'uploads', 'chat_files', filename)
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        file.save(filepath)
+        file_path = f"uploads/chat_files/{filename}"
+
+    message = Message(
+        sender_id=current_user.id,
+        receiver_id=receiver_id,
+        job_id=job_id,
+        content=message_content,
+        file_path=file_path
+    )
+
+    db_sess.add(message)
+    db_sess.commit()
+
     return redirect(url_for('chat',
-                            customer_id=current_user.id if current_user.role == 'customer' else receiver_id,
-                            executor_id=receiver_id if current_user.role == 'customer' else current_user.id))
+                          customer_id=current_user.id if current_user.role == 'customer' else receiver_id,
+                          executor_id=receiver_id if current_user.role == 'customer' else current_user.id,
+                          job_id=job_id))
+
+
+@app.route('/download_file/<int:message_id>')
+@login_required
+def download_file(message_id):
+    db_sess = db_session.create_session()
+    message = db_sess.query(Message).get(message_id)
+    if not message or not message.file_path:
+        abort(404, description="Сообщение или файл не найдены")
+    if current_user.id not in [message.sender_id, message.receiver_id]:
+        abort(403, description="Нет доступа к этому файлу")
+    try:
+        if os.path.isabs(message.file_path):
+            file_path = message.file_path
+        else:
+            file_path = os.path.join(app.root_path, 'static', message.file_path)
+        file_path = os.path.normpath(file_path)
+        if not os.path.isfile(file_path):
+            raise FileNotFoundError
+        return send_file(file_path, as_attachment=True)
+    except FileNotFoundError:
+        abort(404, description="Файл не найден на сервере")
+    except Exception as e:
+        app.logger.error(f"Ошибка при скачивании файла: {str(e)}")
+        abort(500, description="Ошибка сервера при обработке файла")
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect("/")
-
-
-# @app.route("/send", methods=['POST'])
-# @login_required
-# def send_message():
-#     participant = request.form.get('participant')
-#     message_content = request.form.get('message')
-#     now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-#     messages.append({
-#         'sender': participant,
-#         'content': message_content,
-#         'timestamp': now
-#     })
-#     print(messages)
-#     return redirect(request.referrer or "/eee")
 
 
 @app.route('/eee')

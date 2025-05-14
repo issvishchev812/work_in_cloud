@@ -3,7 +3,8 @@
 {% block content %}
 {% if current_user.is_authenticated %}
 <div class="container">
-    <div class="row justify-content-center">
+    <div class="row">
+        <!-- Основная информация о работе -->
         <div class="col-md-8">
             <div class="card my-5">
                 <div class="card-header text-center bg-primary text-white">
@@ -40,13 +41,12 @@
                 <div class="card-footer text-center">
                     {% if current_user.is_authenticated and current_user.role == "executor" %}
                     {% if current_user.id|string in job.responders.split() %}
-                    <a href="/chat/{{ job.customer.id }}-{{ current_user.id }}" class="btn btn-success">Открыть чат</a>
+                    <a href="/chat/{{ job.customer.id }}-{{ current_user.id }}-{{ job.id }}" class="btn btn-success">Открыть чат</a>
                     {% else %}
                     <a href="/respond_to_job/{{ job.id }}" class="btn btn-info">Откликнуться</a>
                     {% endif %}
                     {% endif %}
-                    {% if current_user.is_authenticated and current_user.id == job.customer.id and current_user.role ==
-                    "customer" %}
+                    {% if current_user.is_authenticated and current_user.id == job.customer.id and current_user.role == "customer" %}
                     <a href="/jobs" class="btn btn-secondary">Вернуться</a>
                     <a href="/jobs_edit/{{ job.id }}" class="btn btn-warning">Изменить</a>
                     <a href="/jobs_delete/{{ job.id }}" class="btn btn-danger">Завершить</a>
@@ -56,6 +56,31 @@
                 </div>
             </div>
         </div>
+        {% if current_user.is_authenticated and current_user.id == job.customer.id and current_user.role == "customer" %}
+        <div class="col-md-4">
+            <div class="card my-5">
+                <div class="card-header bg-info text-white text-center">
+                    <h5 class="card-title mb-0">Доступные чаты</h5>
+                </div>
+                <div class="card-body">
+                    {% if responders_users %}
+                        {% for responder in responders_users %}
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <img src="{{ responder.avatar_path }}" alt="Avatar" class="rounded-circle me-2" width="40" height="40">
+                                    <span>{{ responder.name }} {{ responder.surname }}</span>
+                                </div>
+                                <a href="/chat/{{ job.customer.id }}-{{ responder.id }}-{{ job.id }}"
+                                   class="btn btn-sm btn-primary">Открыть чат</a>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center">Нет откликнувшихся исполнителей</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endif %}

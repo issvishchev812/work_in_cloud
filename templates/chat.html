@@ -9,18 +9,48 @@
             <p class="mb-0">Исполнитель: {{ executor.name }} {{ executor.surname }}</p>
         </div>
         <div class="card-body" style="height: 400px; overflow-y: auto;">
-            <!-- Здесь будут сообщения -->
-            <div class="text-center text-muted mt-5">
-                <p>Чат пока пуст. Напишите первое сообщение!</p>
-            </div>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mb-3 {% if message.sender_id == current_user.id %}text-end{% endif %}">
+                        <div class="d-flex {% if message.sender_id == current_user.id %}justify-content-end{% else %}justify-content-start{% endif %}">
+                            {% if message.sender_id != current_user.id %}
+                                <img src="{{ message.sender.avatar_path }}" alt="Avatar" class="rounded-circle me-2" width="40" height="40">
+                            {% endif %}
+                            <div>
+                                <div class="p-3 rounded {% if message.sender_id == current_user.id %}bg-primary text-white{% else %}bg-light{% endif %}">
+                                    <p class="mb-1">{{ message.content }}</p>
+                                    {% if message.file_path %}
+                                        <div class="mt-2">
+                                            <a href="{{ url_for('download_file', message_id=message.id) }}" class="{% if message.sender_id == current_user.id %}text-white{% else %}text-primary{% endif %}">
+                                                <i class="bi bi-file-earmark-arrow-down"></i> {{ message.file_path.split('/')[-1] }}
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <small class="text-muted">{{ message.timestamp.strftime('%d.%m.%Y %H:%M') }}</small>
+                            </div>
+                            {% if message.sender_id == current_user.id %}
+                                <img src="{{ message.sender.avatar_path }}" alt="Avatar" class="rounded-circle ms-2" width="40" height="40">
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center text-muted mt-5">
+                    <p>Чат пока пуст. Напишите первое сообщение!</p>
+                </div>
+            {% endif %}
         </div>
         <div class="card-footer">
-            <form action="/send_message" method="post">
+            <form action="/send_message" method="post" enctype="multipart/form-data">
+                <div class="mb-2">
+                    <input type="file" name="file" class="form-control form-control-sm">
+                </div>
                 <div class="input-group">
                     <input type="hidden" name="job_id" value="{{ job.id }}">
                     <input type="hidden" name="receiver_id"
                            value="{{ customer.id if current_user.id == executor.id else executor.id }}">
-                    <input type="text" name="message" class="form-control" placeholder="Введите сообщение...">
+                    <input type="text" name="message" class="form-control" placeholder="Введите сообщение..." required>
                     <button type="submit" class="btn btn-primary">Отправить</button>
                 </div>
             </form>

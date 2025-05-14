@@ -52,3 +52,33 @@ button {
 button:hover {
     background-color: #0056b3;
 }
+.message-container {
+    max-width: 70%;
+}
+
+.message-bubble {
+    border-radius: 15px;
+    word-wrap: break-word;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.message-animation {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.chat-card {
+    position: sticky;
+    top: 20px;
+}
+
+.chat-item {
+    transition: all 0.2s;
+}
+
+.chat-item:hover {
+    background-color: #f8f9fa;
+}
