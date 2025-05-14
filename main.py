@@ -375,5 +375,16 @@ def edit_profile(id):
                            )
 
 
+@app.route("/search", methods=["POST"])
+@login_required
+def search_jobs():
+    query = request.form.get("query")  # Берём значение из input-а формы
+
+    res = Vacancy.query.filter(Vacancy.title.contains(query)).all()
+
+    return render_template("jobs.html", res=res, query=query)
+
+
+
 if __name__ == '__main__':
     app.run(port=5252, host='127.0.0.1')

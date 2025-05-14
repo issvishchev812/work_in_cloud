@@ -1,17 +1,75 @@
+<!DOCTYPE html>
 {% extends "base.html" %}
 
 {% block content %}
-<div align="center" class="container mt-5">
-    <h1 align="center">Start in IT</h1>
-    <h2>content</h2>
-    <h3>content</h3>
-    <h4>content</h4>
-    <h5>content</h5>
-    <h6>content</h6>
-    <p>content</p>
-    <p>content</p>
+<div class="container my-5">
+    <!-- Hero Section -->
+    <section class="hero-section pb-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6 text-center">
+                <h1 class="display-4 fw-bold">Work In Cloud</h1>
+                <p class="lead">Свободная биржа труда для специалистов в сфере информационных технологий.</p>
+                <a href="/about" class="btn btn-outline-primary btn-lg rounded-pill">Узнать подробнее</a>
+            </div>
+        </div>
+    </section>
 
+    <!-- Features Section -->
+    <section id="features" class="my-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-10 col-lg-8 text-center">
+                    <h2 class="fw-bold">Почему выбирают Work In Cloud?</h2>
+                    <p class="mb-5 lead">Наш сервис помогает специалистам найти лучшие проекты и зарабатывать больше.</p>
+                </div>
+            </div>
 
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-check-circle-fill text-success display-1"></i>
+                            <h3 class="mt-3">Удобство поиска проектов</h3>
+                            <p>Простой и понятный интерфейс позволяет находить подходящие заказы буквально за минуты.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-person-square text-info display-1"></i>
+                            <h3 class="mt-3">Профессиональные исполнители</h3>
+                            <p>Работайте с лучшими специалистами разных направлений: программистами, дизайнерами, маркетологами и аналитиками.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-wallet2 text-warning display-1"></i>
+                            <h3 class="mt-3">Справедливая оплата труда</h3>
+                            <p>Платформа защищает интересы обеих сторон сделки, обеспечивая честную оплату выполненных работ.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="call-to-action py-5 bg-dark text-white">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6 text-center">
+                    <h2 class="fw-bold">Начните свою карьеру в IT прямо сейчас!</h2>
+                    <p class="lead">Присоединяйтесь к нашей площадке и получите первый заказ уже сегодня.</p>
+                    <a href="/jobs" class="btn btn-primary btn-lg rounded-pill">Перейти к заказам</a>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 
 {% endblock %}
