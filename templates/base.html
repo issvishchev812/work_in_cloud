@@ -23,7 +23,7 @@
             </ul>
 
             <form style="width: 400px; margin-left: -50px;" class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search" method="post" action="/search">
-                <input type="search" class="form-control" placeholder="Поиск..." aria-label="Search">
+                <input type="search" class="form-control" placeholder="Поиск..." aria-label="Search" name="query">
             </form>
 
             {% if current_user.is_authenticated %}

@@ -378,11 +378,15 @@ def edit_profile(id):
 @app.route("/search", methods=["POST"])
 @login_required
 def search_jobs():
-    query = request.form.get("query")  # Берём значение из input-а формы
+    query = request.form.get("query")  # Берём значение из input-a формы
+    db_sess = db_session.create_session()
+    print(query)
+    if query:
+        res = db_sess.query(Vacancy).filter(Vacancy.job_name.contains(query)).all()
+    else:
+        res = []
 
-    res = Vacancy.query.filter(Vacancy.title.contains(query)).all()
-
-    return render_template("jobs.html", res=res, query=query)
+    return render_template("jobs.html", res=res, query=query, arr=db_sess.query(Vacancy).join(User).all())
 
 
 

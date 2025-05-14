@@ -3,6 +3,50 @@
 {% block content %}
 {% if current_user.is_authenticated %}
 <div class="container">
+    {% if res %}
+        <h1 class="text-center">Результаты поиска</h1>
+        <div class="d-flex flex-column align-items-center">
+        {% for work in res %}
+            <div style="width: 800px; margin-bottom: 20px;" class="card">
+                <div class="card-header">
+                    <h2>{{ work.job_name }}</h2>
+                </div>
+                <div class="card-body">
+                    <p class="card-text"><strong>Заказчик:</strong> {{ work.customer.name }} {{ work.customer.surname }}</p>
+                    <p class="card-text"><strong>Объем работы:</strong> {{ work.work_size }} Часов</p>
+                    <p class="card-text"><strong>Описание:</strong> {{ work.description }}</p>
+                    <p class="card-text"><strong>Оплата:</strong> {{ work.salary }} ₽</p>
+                    <p class="card-text"><strong>Статус:</strong>
+                        {% if work.is_finished %}
+                        <span class="badge bg-success">Да</span>
+                        {% else %}
+                        <span class="badge bg-warning text-dark">В процессе</span>
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center">
+                    <div>
+                        <a href="/work/{{ work.id }}" class="btn btn-primary me-2">Открыть</a>
+                        {% if current_user.is_authenticated and current_user.id == work.customer.id %}
+                        <a href="/jobs_edit/{{ work.id }}" class="btn btn-warning me-2">Изменить</a>
+                        <a href="/jobs_delete/{{ work.id }}" class="btn btn-danger">Завершить</a>
+                        {% endif %}
+                    </div>
+                    {% if current_user.is_authenticated and current_user.role == "executor" %}
+                    {% if current_user.id|string in work.responders.split() %}
+                    <a href="/chat/{{ work.customer.id }}-{{ current_user.id }}-{{ work.id }}" class="btn btn-success">Открыть чат</a>
+                    {% else %}
+                    <a href="/respond_to_job/{{ work.id }}" class="btn btn-info">Откликнуться</a>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% elif query %}
+        <h1 class="text-center">Нет результатов по данному запросу</h1>
+    {% endif %}
+
     <h1 class="text-center">Все заказы</h1>
     <div class="d-flex flex-column align-items-center">
         {% for job in arr %}
