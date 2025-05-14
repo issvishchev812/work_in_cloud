@@ -7,7 +7,7 @@
     <form action="" method="post">
         {{ form.hidden_tag() }}
         <p>
-            {{ form.job_name.label }}<br>
+            Название работы<br>
             {{ form.job_name(class="form-control") }}<br>
             {% for error in form.job_name.errors %}
                 <p content="alert alert-danger" role="alert">
@@ -16,7 +16,7 @@
             {% endfor %}
         </p>
         <p>
-            {{ form.work_size.label }}<br>
+            Объем работы<br>
             {{ form.work_size(class="form-control") }}<br>
             {% for error in form.work_size.errors %}
                 <p content="alert alert-danger" role="alert">
@@ -25,7 +25,7 @@
             {% endfor %}
         </p>
         <p>
-            {{ form.description.label }}<br>
+            Описание<br>
             {{ form.description(class="form-control") }}<br>
             {% for error in form.description.errors %}
                 <p content="alert alert-danger" role="alert">
@@ -34,7 +34,7 @@
             {% endfor %}
         </p>
         <p>
-            {{ form.salary.label }}<br>
+            Оплата<br>
             {{ form.salary(class="form-control") }}<br>
             {% for error in form.salary.errors %}
                 <p content="alert alert-danger" role="alert">
