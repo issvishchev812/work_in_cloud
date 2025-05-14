@@ -1,5 +1,8 @@
 import os
 from datetime import datetime
+import unicodedata
+import re
+
 
 from flask import Flask, render_template, redirect, request, flash, url_for, abort, send_file
 from werkzeug.utils import secure_filename
@@ -16,6 +19,7 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from data.messages import Message
 from data.user import User
 from data.vacancy import Vacancy
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -73,7 +77,8 @@ def register():
             avatar_path = r"basic_avatar.jpg"
 
         if db_sess.query(User).filter(User.email == form.email.data).first():
-            return render_template('register.html', title='Регистрация', form=form, message="Такой email уже зарегистрирован.")
+            return render_template('register.html', title='Регистрация', form=form,
+                                   message="Такой email уже зарегистрирован.")
 
         common_data = {
             'name': form.name.data,
@@ -98,6 +103,7 @@ def register():
 
     return render_template('register.html', title='Регистрация', form=form, role=role)
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -108,8 +114,8 @@ def login():
             login_user(user, remember=form.remember_me.data)
             return redirect("/main")
         return render_template('login.html',
-                                   message="Неправильный логин или пароль",
-                                   form=form)
+                               message="Неправильный логин или пароль",
+                               form=form)
 
     return render_template('login.html', title='Авторизация', form=form)
 
@@ -267,13 +273,25 @@ def chat(customer_id, executor_id, job_id):
         Message.job_id == job_id
     ).order_by(Message.timestamp).all()
 
-
     return render_template('chat.html',
                            customer=customer,
                            executor=executor,
                            job_id=job_id,
                            job=job,
-                           messages=messages,)
+                           messages=messages, )
+
+
+def safe_secure_filename(filename):
+    name, ext = os.path.splitext(filename)
+    name = unicodedata.normalize('NFKD', name)
+    name = name.encode('utf-8', 'ignore').decode('utf-8')
+    name = re.sub(r'[^\w\s\-а-яА-ЯёЁ]', '', name, flags=re.IGNORECASE | re.UNICODE)
+    name = re.sub(r'\s+', '_', name).strip()
+    ext = unicodedata.normalize('NFKD', ext)
+    ext = ext.encode('utf-8', 'ignore').decode('utf-8')
+    ext = re.sub(r'[^a-z0-9.]', '', ext, flags=re.IGNORECASE)
+    filename = f"{name}{ext}"
+    return filename
 
 
 @app.route('/send_message', methods=['POST'])
@@ -288,8 +306,12 @@ def send_message():
 
     file_path = None
     if file and file.filename != '':
-        filename = secure_filename(file.filename)
-        filepath = os.path.join(app.root_path, 'static', 'uploads', 'chat_files', filename)
+        filename = safe_secure_filename(file.filename)
+        filepath = os.path.join(
+            app.root_path,
+            'static/uploads/chat_files',
+            filename
+        )
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
         file.save(filepath)
         file_path = f"uploads/chat_files/{filename}"
@@ -306,9 +328,9 @@ def send_message():
     db_sess.commit()
 
     return redirect(url_for('chat',
-                          customer_id=current_user.id if current_user.role == 'customer' else receiver_id,
-                          executor_id=receiver_id if current_user.role == 'customer' else current_user.id,
-                          job_id=job_id))
+                            customer_id=current_user.id if current_user.role == 'customer' else receiver_id,
+                            executor_id=receiver_id if current_user.role == 'customer' else current_user.id,
+                            job_id=job_id))
 
 
 @app.route('/download_file/<int:message_id>')
@@ -335,16 +357,12 @@ def download_file(message_id):
         app.logger.error(f"Ошибка при скачивании файла: {str(e)}")
         abort(500, description="Ошибка сервера при обработке файла")
 
+
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect("/")
-
-
-@app.route('/eee')
-def eee():
-    return render_template('eee.html', messages=messages)
 
 
 @app.route('/profile')
@@ -400,7 +418,6 @@ def edit_profile(id):
             file.save(filepath)
             user.avatar_path = filepath
 
-
         if user:
             # Обновляем данные из формы
             user.email = form.email.data
@@ -442,9 +459,7 @@ def search_jobs():
 @app.route("/about")
 @login_required
 def about():
-
     return render_template("about.html")
-
 
 
 if __name__ == '__main__':

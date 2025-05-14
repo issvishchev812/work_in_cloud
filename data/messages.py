@@ -15,6 +15,7 @@ class Message(SqlAlchemyBase):
     file_path = Column(String(255), nullable=True)
     timestamp = Column(DateTime, default=datetime.now)
 
+
     sender = relationship("User", foreign_keys=[sender_id])
     receiver = relationship("User", foreign_keys=[receiver_id])
     job = relationship("Vacancy")
