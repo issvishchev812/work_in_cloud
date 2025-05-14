@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block content %}
-{% if current_user.is_authenticated %}
+{% block content %}{% if current_user.is_authenticated %}
+
 <div class="container">
     <div class="row">
         <!-- Основная информация о работе -->
-        <div class="col-md-8">
+         <div class="col-md-{% if current_user.role == 'executor' %}6 offset-md-2{% else %}8{% endif %}" style="width: 900px">
             <div class="card my-5">
                 <div class="card-header text-center bg-primary text-white">
                     <h1 class="card-title">{{ job.job_name }}</h1>

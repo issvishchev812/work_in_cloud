@@ -11,7 +11,7 @@
         <div class="card-body" style="height: 400px; overflow-y: auto;">
             {% if messages %}
                 {% for message in messages %}
-                    <div class="mb-3 {% if message.sender_id == current_user.id %}text-end{% endif %}">
+                    <div class="mb-3 {% if message.sender_id == current_user.id %}text-end ms-auto pe-3{% else %}text-start me-3{% endif %}">
                         <div class="d-flex {% if message.sender_id == current_user.id %}justify-content-end{% else %}justify-content-start{% endif %}">
                             {% if message.sender_id != current_user.id %}
                                 <img src="{{ url_for('static', filename='/'.join(message.sender.avatar_path.split('/')[1:])) }}" alt="Avatar" class="rounded-circle me-2" width="40" height="40">
@@ -30,7 +30,7 @@
                                 <small class="text-muted">{{ message.timestamp.strftime('%d.%m.%Y %H:%M') }}</small>
                             </div>
                             {% if message.sender_id == current_user.id %}
-                                <img src="{{ url_for('static', filename='/'.join(message.sender.avatar_path.split('/')[1:])) }}" alt="Avatar" class="rounded-circle me-2" width="40" height="40">
+                                <img src="{{ url_for('static', filename='/'.join(message.sender.avatar_path.split('/')[1:])) }}" alt="Avatar" class="rounded-circle ms-2" width="40" height="40">
                             {% endif %}
                         </div>
                     </div>
