@@ -1,0 +1,15 @@
+blinker
+click
+Flask
+Flask-Login
+Flask-WTF
+importlib_metadata
+itsdangerous
+Jinja2
+MarkupSafe
+pillow
+SQLAlchemy
+typing_extensions
+Werkzeug
+WTForms
+zipp
